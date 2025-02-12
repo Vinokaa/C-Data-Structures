@@ -119,6 +119,33 @@ void lstInsertChar(LinkedList* list, char c){
     list->size += 1;
 }
 
+void lstInsertString(LinkedList* list, char* s){
+    Node* head = list->head;
+
+    Node* new = (Node*) malloc(sizeof(Node));
+    new->type = TYPE_STRING;
+
+    new->val = malloc(sizeof(s));
+    memcpy(new->val, s, sizeof(s));
+
+    new->next = NULL;
+
+    if(head->type == TYPE_UNDEFINED){
+        head->val = malloc(sizeof(s));
+        memcpy(head, new, sizeof(*new));
+        free(new);
+    }else{
+        Node* tmp = head;
+        while(tmp->next != NULL){
+            tmp = tmp->next;
+        }
+
+        tmp->next = new;
+    }
+
+    list->size += 1;
+}
+
 void printList(LinkedList* list){
     Node* tmp = list->head;
 
@@ -185,6 +212,11 @@ int main(){
     printf("\n");
 
     lstInsertDouble(teste, 3.14);
+
+    printList(teste);
+    printf("\n");
+
+    lstInsertString(teste, "Vina");
 
     printList(teste);
 
