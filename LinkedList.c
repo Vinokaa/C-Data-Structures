@@ -29,6 +29,7 @@ struct LinkedList{
 LinkedList* LinkedListConstructor(){
     Node* tmp = (Node*) malloc(sizeof(Node));
     tmp->type = TYPE_UNDEFINED;
+    tmp->val = NULL;
     tmp->next = NULL;
 
     LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
@@ -38,22 +39,41 @@ LinkedList* LinkedListConstructor(){
     return list;
 }
 
-void lstInsertInt(LinkedList* list, int n){
+void clearNode(Node* node){
+    if(node->val != NULL){
+        free(node->val);
+    }
+
+    free(node);
+}
+
+void clearListRecursive(Node* node){
+    if(node != NULL){
+        clearListRecursive(node->next);
+        clearNode(node);
+    }
+}
+
+void clearList(LinkedList* list){
+    clearListRecursive(list->head);
+}
+
+void listInsertInt(LinkedList* list, int n){
     Node* head = list->head;
 
-    Node* new = (Node*) malloc(sizeof(Node));
-    new->type = TYPE_INT;
-
-    new->val = malloc(sizeof(int));
-    memcpy(new->val, &n, sizeof(int));
-
-    new->next = NULL;
-
     if(head->type == TYPE_UNDEFINED){
+        head->type = TYPE_INT;
         head->val = malloc(sizeof(int));
-        memcpy(head, new, sizeof(*new));
-        free(new);
+        memcpy(head->val, &n, sizeof(int));
     }else{
+        Node* new = (Node*) malloc(sizeof(Node));
+        new->type = TYPE_INT;
+
+        new->val = malloc(sizeof(int));
+        memcpy(new->val, &n, sizeof(int));
+
+        new->next = NULL;
+
         Node* tmp = head;
         while(tmp->next != NULL){
             tmp = tmp->next;
@@ -65,22 +85,22 @@ void lstInsertInt(LinkedList* list, int n){
     list->size += 1;
 }
 
-void lstInsertDouble(LinkedList* list, double d){
+void listInsertDouble(LinkedList* list, double d){
     Node* head = list->head;
 
-    Node* new = (Node*) malloc(sizeof(Node));
-    new->type = TYPE_FLOAT;
-
-    new->val = malloc(sizeof(double));
-    memcpy(new->val, &d, sizeof(double));
-
-    new->next = NULL;
-
     if(head->type == TYPE_UNDEFINED){
+        head->type = TYPE_FLOAT;
         head->val = malloc(sizeof(double));
-        memcpy(head, new, sizeof(*new));
-        free(new);
+        memcpy(head->val, &d, sizeof(double));
     }else{
+        Node* new = (Node*) malloc(sizeof(Node));
+        new->type = TYPE_FLOAT;
+
+        new->val = malloc(sizeof(double));
+        memcpy(new->val, &d, sizeof(double));
+
+        new->next = NULL;
+
         Node* tmp = head;
         while(tmp->next != NULL){
             tmp = tmp->next;
@@ -92,22 +112,22 @@ void lstInsertDouble(LinkedList* list, double d){
     list->size += 1;
 }
 
-void lstInsertChar(LinkedList* list, char c){
+void listInsertChar(LinkedList* list, char c){
     Node* head = list->head;
 
-    Node* new = (Node*) malloc(sizeof(Node));
-    new->type = TYPE_CHAR;
-
-    new->val = malloc(sizeof(char));
-    memcpy(new->val, &c, sizeof(char));
-
-    new->next = NULL;
-
     if(head->type == TYPE_UNDEFINED){
+        head->type = TYPE_CHAR;
         head->val = malloc(sizeof(char));
-        memcpy(head, new, sizeof(*new));
-        free(new);
+        memcpy(head->val, &c, sizeof(char));
     }else{
+        Node* new = (Node*) malloc(sizeof(Node));
+        new->type = TYPE_CHAR;
+
+        new->val = malloc(sizeof(char));
+        memcpy(new->val, &c, sizeof(char));
+
+        new->next = NULL;
+
         Node* tmp = head;
         while(tmp->next != NULL){
             tmp = tmp->next;
@@ -119,22 +139,22 @@ void lstInsertChar(LinkedList* list, char c){
     list->size += 1;
 }
 
-void lstInsertString(LinkedList* list, char* s){
+void listInsertString(LinkedList* list, char* s){
     Node* head = list->head;
 
-    Node* new = (Node*) malloc(sizeof(Node));
-    new->type = TYPE_STRING;
-
-    new->val = malloc(sizeof(s));
-    memcpy(new->val, s, sizeof(s));
-
-    new->next = NULL;
-
     if(head->type == TYPE_UNDEFINED){
+        head->type = TYPE_STRING;
         head->val = malloc(sizeof(s));
-        memcpy(head, new, sizeof(*new));
-        free(new);
+        memcpy(head->val, s, sizeof(s));
     }else{
+        Node* new = (Node*) malloc(sizeof(Node));
+        new->type = TYPE_STRING;
+
+        new->val = malloc(sizeof(s));
+        memcpy(new->val, s, sizeof(s));
+
+        new->next = NULL;
+
         Node* tmp = head;
         while(tmp->next != NULL){
             tmp = tmp->next;
@@ -146,22 +166,22 @@ void lstInsertString(LinkedList* list, char* s){
     list->size += 1;
 }
 
-void lstInsertStruct(LinkedList* list, void* s){
+void listInsertStruct(LinkedList* list, void* s){
     Node* head = list->head;
 
-    Node* new = (Node*) malloc(sizeof(Node));
-    new->type = TYPE_STRUCT;
-
-    new->val = malloc(sizeof(s));
-    memcpy(new->val, s, sizeof(s));
-
-    new->next = NULL;
-
     if(head->type == TYPE_UNDEFINED){
+        head->type = TYPE_STRUCT;
         head->val = malloc(sizeof(s));
-        memcpy(head, new, sizeof(*new));
-        free(new);
+        memcpy(head->val, s, sizeof(s));
     }else{
+        Node* new = (Node*) malloc(sizeof(Node));
+        new->type = TYPE_STRUCT;
+
+        new->val = malloc(sizeof(s));
+        memcpy(new->val, s, sizeof(s));
+
+        new->next = NULL;
+
         Node* tmp = head;
         while(tmp->next != NULL){
             tmp = tmp->next;
@@ -171,12 +191,74 @@ void lstInsertStruct(LinkedList* list, void* s){
     }
 
     list->size += 1;
+}
+
+Node* getNodeFromList(LinkedList* list, int index){
+    if(index > list->size-1 || index < 0){
+        puts("List index out of range");
+        return NULL;
+    }
+
+    Node* tmp = list->head;
+
+    for(int i = 0; i < index; i++){
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
+
+void* removeFirstFromList(LinkedList* list){
+    if(list->size < 1){
+        puts("List is empty");
+        return NULL;
+    }else{
+        Node* removedNode = list->head;
+        void* removedValue = malloc(sizeof(removedNode->val));
+        memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
+
+        if(list->size == 1){
+            removedNode->type = TYPE_UNDEFINED;
+            free(removedNode->val);
+            removedNode->val = NULL;
+        }else{
+            list->head = list->head->next;
+        
+            clearNode(removedNode);
+        }
+
+        list->size--;
+        return removedValue;
+    }
+}
+
+void* removeLastFromList(LinkedList* list){
+    if(list->size < 1){
+        puts("List is empty");
+        return NULL;
+    }else if(list->size == 1){
+        return removeFirstFromList(list);
+    }else{
+        Node* nxtToLast = getNodeFromList(list, list->size - 2);
+
+        Node* removedNode = nxtToLast->next;
+        nxtToLast->next = NULL;
+        void* removedValue = malloc(sizeof(removedNode->val));
+        memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
+
+        clearNode(removedNode);
+        list->size--;
+
+        return removedValue;
+    }
 }
 
 void printList(LinkedList* list){
-    Node* tmp = list->head;
+    LinkedList* string = LinkedListConstructor();
 
     printf("[");
+
+    Node* tmp = list->head;
 
     while(tmp->next != NULL){
         switch(tmp->type){
@@ -220,6 +302,75 @@ void printList(LinkedList* list){
         default:
             printf("struct@%p]\n", tmp);
     }
+
+    if(string->size > 0){
+        printList(string);
+    }
+
+    clearList(string);
+}
+
+void listToString(LinkedList* list){
+    LinkedList* string = LinkedListConstructor();
+
+    Node* tmp = list->head;
+
+    while(tmp != NULL){
+        switch(tmp->type){
+            case TYPE_UNDEFINED:
+                break;
+            case TYPE_INT:
+                LinkedList* intList = LinkedListConstructor();
+                int n = *(int*) tmp->val;
+
+                while(n > 0){
+                    listInsertChar(intList, n % 10 + 48);
+                    n = (int) (n / 10);
+                }
+
+                while(intList->size > 0){
+                    char c = *(char*) removeLastFromList(intList);
+                    listInsertChar(string, c);
+                }
+
+                clearList(intList);
+                break;
+            case TYPE_FLOAT:
+
+                break;
+            case TYPE_CHAR:
+                
+                break;
+            case TYPE_STRING:
+                
+                break;
+            default:
+                
+        }
+        
+        tmp = tmp->next;
+    }
+
+    if(string->size > 0){
+        printList(string);
+    }
+
+    clearList(string);
+}
+
+void* getValueFromList(LinkedList* list, int index){
+    if(index > list->size-1 || index < 0){
+        puts("Index out of range");
+        return NULL;
+    }
+
+    Node* tmp = list->head;
+
+    for(int i = 0; i < index; i++){
+        tmp = tmp->next;
+    }
+
+    return tmp->val;
 }
 
 int main(){
@@ -228,29 +379,48 @@ int main(){
     printList(teste);
     printf("\n");
 
-    lstInsertInt(teste, 1);
+    listInsertInt(teste, 154);
 
     printList(teste);
     printf("\n");
 
-    lstInsertChar(teste, 'a');
+    listInsertChar(teste, 'a');
 
     printList(teste);
     printf("\n");
 
-    lstInsertDouble(teste, 3.14);
+    listInsertDouble(teste, 3.14);
+
+    printf("listToString() = ");
+    listToString(teste);
 
     printList(teste);
     printf("\n");
 
-    lstInsertString(teste, "Vina");
+    listInsertString(teste, "Vina");
 
     printList(teste);
     printf("\n");
 
-    lstInsertStruct(teste, LinkedListConstructor());
+    int i = *(int*) removeFirstFromList(teste);
+    printf("removed: %d\n", i);
 
     printList(teste);
+    printf("\n");
+
+    char* s = (char*) removeLastFromList(teste);
+    printf("removed: %s\n", s);
+
+    printList(teste);
+    printf("\n");
+
+    listInsertStruct(teste, LinkedListConstructor());
+
+    printList(teste);
+    printf("\n");
+
+    char n = *(char*) getValueFromList(teste, 0);
+    printf("%c", n);
 
     free(teste);
 
