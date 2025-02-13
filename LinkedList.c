@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+short double_precision = 2;
+
 typedef struct Node Node;
 typedef struct LinkedList LinkedList;
 typedef struct String String;
@@ -253,65 +255,46 @@ void* removeLastFromList(LinkedList* list){
     }
 }
 
-void printList(LinkedList* list){
-    LinkedList* string = LinkedListConstructor();
+void numToCharList(LinkedList* dest, double d, type_t type){
+    if(type == TYPE_INT || type == TYPE_FLOAT){
+        LinkedList* list = LinkedListConstructor();
+        int n;
 
-    printf("[");
+        if(type == TYPE_FLOAT){
+            for(int i = 0; i < double_precision; i++){
+                d *= 10;
+            }
 
-    Node* tmp = list->head;
+            n = (int) d;
 
-    while(tmp->next != NULL){
-        switch(tmp->type){
-            case TYPE_UNDEFINED:
-                break;
-            case TYPE_INT:
-                printf("%d, ", *(int*) tmp->val);
-                break;
-            case TYPE_FLOAT:
-                printf("%.2f, ", *(double*) tmp->val);
-                break;
-            case TYPE_CHAR:
-                printf("%c, ", *(char*) tmp->val);
-                break;
-            case TYPE_STRING:
-                printf("%s, ", (char*) tmp->val);
-                break;
-            default:
-                printf("struct@%p, ", tmp);
+            for(int i = 0; i < double_precision; i++){
+                listInsertChar(list, n % 10 + 48);
+                n = (int) (n / 10);
+            }
+
+            listInsertChar(list, '.');
+        }else{
+            n = (int) d;
         }
-        
-        tmp = tmp->next;
-    }
 
-    switch(tmp->type){
-        case TYPE_UNDEFINED:
-            printf("]\n");
-            break;
-        case TYPE_INT:
-            printf("%d]\n", *(int*) tmp->val);
-            break;
-        case TYPE_FLOAT:
-            printf("%.2f]\n", *(double*) tmp->val);
-            break;
-        case TYPE_CHAR:
-            printf("%c]\n", *(char*) tmp->val);
-            break;
-        case TYPE_STRING:
-            printf("%s]\n", (char*) tmp->val);
-            break;
-        default:
-            printf("struct@%p]\n", tmp);
-    }
+        while(n > 0){
+            listInsertChar(list, n % 10 + 48);
+            n = (int) (n / 10);
+        }
 
-    if(string->size > 0){
-        printList(string);
-    }
+        while(list->size > 0){
+            char c = *(char*) removeLastFromList(list);
+            listInsertChar(dest, c);
+        }
 
-    clearList(string);
+        clearList(list);
+    }
 }
 
-void listToString(LinkedList* list){
+char* listToString(LinkedList* list){
     LinkedList* string = LinkedListConstructor();
+    char* s;
+    listInsertChar(string, '[');
 
     Node* tmp = list->head;
 
@@ -320,42 +303,64 @@ void listToString(LinkedList* list){
             case TYPE_UNDEFINED:
                 break;
             case TYPE_INT:
-                LinkedList* intList = LinkedListConstructor();
                 int n = *(int*) tmp->val;
-
-                while(n > 0){
-                    listInsertChar(intList, n % 10 + 48);
-                    n = (int) (n / 10);
-                }
-
-                while(intList->size > 0){
-                    char c = *(char*) removeLastFromList(intList);
-                    listInsertChar(string, c);
-                }
-
-                clearList(intList);
+                numToCharList(string, n, TYPE_INT);
+                
                 break;
             case TYPE_FLOAT:
+                double d = *(double*) tmp->val;
+                numToCharList(string, d, TYPE_FLOAT);
 
                 break;
             case TYPE_CHAR:
-                
+                char c = *(char*) tmp->val;
+                listInsertChar(string, c);
+
                 break;
             case TYPE_STRING:
+                s = (char*) tmp->val;
+
+                while(*s != '\0'){
+                    listInsertChar(string, *s);
+                    s++;
+                }
                 
                 break;
-            default:
-                
+            case TYPE_STRUCT:
+                char* structStr = (char*) malloc(sizeof("struct@") + sizeof(void*));
+                sprintf(structStr, "struct@%p", tmp->val);
+
+                s = structStr;
+
+                while(*s != '\0'){
+                    listInsertChar(string, *s);
+                    s++;
+                }
+
+                free(structStr);
+
+                break;
         }
         
+        listInsertChar(string, ',');
+        listInsertChar(string, ' ');
         tmp = tmp->next;
     }
 
-    if(string->size > 0){
-        printList(string);
+    removeLastFromList(string); // remove unwanted ','
+    removeLastFromList(string); // remove unwanted ' '
+    listInsertChar(string, ']');
+
+    char* returnedString = (char*) malloc(string->size + 1);
+    returnedString[string->size] = '\0';
+
+    for(int i = 0; string->size > 0; i++){
+        returnedString[i] = *(char*) removeFirstFromList(string);
     }
 
     clearList(string);
+
+    return returnedString;
 }
 
 void* getValueFromList(LinkedList* list, int index){
@@ -373,54 +378,47 @@ void* getValueFromList(LinkedList* list, int index){
     return tmp->val;
 }
 
+void changeDoublePrecision(short n){
+    double_precision = n;
+}
+
 int main(){
     LinkedList* teste = LinkedListConstructor();
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     listInsertInt(teste, 154);
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     listInsertChar(teste, 'a');
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     listInsertDouble(teste, 3.14);
 
-    printf("listToString() = ");
-    listToString(teste);
-
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     listInsertString(teste, "Vina");
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     int i = *(int*) removeFirstFromList(teste);
     printf("removed: %d\n", i);
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     char* s = (char*) removeLastFromList(teste);
     printf("removed: %s\n", s);
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     listInsertStruct(teste, LinkedListConstructor());
 
-    printList(teste);
-    printf("\n");
+    printf("%s\n", listToString(teste));
 
     char n = *(char*) getValueFromList(teste, 0);
-    printf("%c", n);
+    printf("%c\n", n);
 
     free(teste);
 
