@@ -146,6 +146,33 @@ void lstInsertString(LinkedList* list, char* s){
     list->size += 1;
 }
 
+void lstInsertStruct(LinkedList* list, void* s){
+    Node* head = list->head;
+
+    Node* new = (Node*) malloc(sizeof(Node));
+    new->type = TYPE_STRUCT;
+
+    new->val = malloc(sizeof(s));
+    memcpy(new->val, s, sizeof(s));
+
+    new->next = NULL;
+
+    if(head->type == TYPE_UNDEFINED){
+        head->val = malloc(sizeof(s));
+        memcpy(head, new, sizeof(*new));
+        free(new);
+    }else{
+        Node* tmp = head;
+        while(tmp->next != NULL){
+            tmp = tmp->next;
+        }
+
+        tmp->next = new;
+    }
+
+    list->size += 1;
+}
+
 void printList(LinkedList* list){
     Node* tmp = list->head;
 
@@ -168,7 +195,7 @@ void printList(LinkedList* list){
                 printf("%s, ", (char*) tmp->val);
                 break;
             default:
-                printf("Struct, ");
+                printf("struct@%p, ", tmp);
         }
         
         tmp = tmp->next;
@@ -191,7 +218,7 @@ void printList(LinkedList* list){
             printf("%s]\n", (char*) tmp->val);
             break;
         default:
-            printf("Struct]\n");
+            printf("struct@%p]\n", tmp);
     }
 }
 
@@ -217,6 +244,11 @@ int main(){
     printf("\n");
 
     lstInsertString(teste, "Vina");
+
+    printList(teste);
+    printf("\n");
+
+    lstInsertStruct(teste, LinkedListConstructor());
 
     printList(teste);
 
