@@ -6,7 +6,6 @@ short double_precision = 2;
 
 typedef struct Node Node;
 typedef struct LinkedList LinkedList;
-typedef struct String String;
 
 typedef enum{
     TYPE_UNDEFINED,
@@ -36,11 +35,12 @@ LinkedList* LinkedListConstructor();
 
 void listInsertChar(LinkedList* list, char c, int index);
 
-void* removeLastFromList(LinkedList* list);
+void* removeFromList(LinkedList* list, int index);
 
 void clearNode(Node* node){
     if(node->val != NULL){
-        free(node->val);
+        if(node->type != TYPE_STRING && node->type != TYPE_STRUCT)
+            free(node->val);
     }
 
     free(node);
@@ -55,13 +55,17 @@ void clearListRecursive(Node* node){
 
 void clearList(LinkedList* list){
     clearListRecursive(list->head);
+
+    free(list);
 }
 
 Node* getNodeFromList(LinkedList* list, int index){
-    if(index > list->size-1 || index < 0){
-        puts("List index out of range");
+    if(index >= list->size || index < -1){
+        printf("List retrieval index out of range | List size is %d\n", list->size);
         return NULL;
     }
+
+    if(index == -1) index = list->size-1;
 
     Node* tmp = list->head;
 
@@ -100,7 +104,7 @@ void numToCharList(LinkedList* dest, double d, type_t type){
         }
 
         while(list->size > 0){
-            char c = *(char*) removeLastFromList(list);
+            char c = *(char*) removeFromList(list, -1);
             listInsertChar(dest, c, -1);
         }
 
@@ -115,14 +119,9 @@ void numToCharList(LinkedList* dest, double d, type_t type){
 //////////////////////////////////////    Constructors    /////////////////////////////////////
 
 LinkedList* LinkedListConstructor(){
-    Node* tmp = (Node*) malloc(sizeof(Node));
-    tmp->type = TYPE_UNDEFINED;
-    tmp->val = NULL;
-    tmp->next = NULL;
-
     LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
     list->size = 0;
-    list->head = tmp;
+    list->head = NULL;
 
     return list;
 }
@@ -133,11 +132,12 @@ Node* listInsertFirst(LinkedList* list){
     Node* head = list->head;
     Node* new;
 
-    if(head->type == TYPE_UNDEFINED){
-        new = head;
+    if(head == NULL){
+        list->head = (Node*) malloc(sizeof(Node));
+        list->head->next = NULL;
+        new = list->head;
     }else{
         new = (Node*) malloc(sizeof(Node));
-
         new->next = head;
         list->head = new;
     }
@@ -149,17 +149,13 @@ Node* listInsertLast(LinkedList* list){
     Node* head = list->head;
     Node* new;
 
-    if(head->type == TYPE_UNDEFINED){
-        new = head;
+    if(head == NULL){
+        new = listInsertFirst(list);
     }else{
         new = (Node*) malloc(sizeof(Node));
-
         new->next = NULL;
 
-        Node* tmp = head;
-        while(tmp->next != NULL){
-            tmp = tmp->next;
-        }
+        Node* tmp = getNodeFromList(list, list->size-1);
 
         tmp->next = new;
     }
@@ -168,8 +164,8 @@ Node* listInsertLast(LinkedList* list){
 }
 
 Node* listInsert(LinkedList* list, int index){
-    if(index >= list->size || index < -1){
-        puts("List insertion index out of range");
+    if(index > list->size || index < -1){
+        printf("List insertion index out of range | List size is %d\n", list->size);
         return NULL;
     }
 
@@ -183,16 +179,13 @@ Node* listInsert(LinkedList* list, int index){
         Node* head = list->head;
         new = (Node*) malloc(sizeof(Node));
 
-        Node* tmp = head;
-        for(int i = 0; i < index; i++){
-            tmp = tmp->next;
-        }
+        Node* tmp = getNodeFromList(list, index);
 
         new->next = tmp->next;
         tmp->next = new;
     }
 
-    list->size += 1;
+    list->size++;
     return new;
 }
 
@@ -220,93 +213,72 @@ void listInsertChar(LinkedList* list, char c, int index){
 void listInsertString(LinkedList* list, char* s, int index){
     Node* new = listInsert(list, index);
     new->type = TYPE_STRING;
-    new->val = malloc(sizeof(s));
-    memcpy(new->val, s, sizeof(s));
+    new->val = s;
 }
 
 void listInsertStruct(LinkedList* list, void* s, int index){
     Node* new = listInsert(list, index);
     new->type = TYPE_STRUCT;
-    new->val = malloc(sizeof(s));
-    memcpy(new->val, s, sizeof(s));
+    new->val = s;
 }
 
 /////////////////////////////////    List Remove Functions    /////////////////////////////////
 
-void* removeFirstFromList(LinkedList* list){
-    if(list->size < 1){
-        puts("List is empty");
-        return NULL;
-    }else{
-        Node* removedNode = list->head;
-        void* removedValue = malloc(sizeof(removedNode->val));
-        memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
-
-        if(list->size == 1){
-            removedNode->type = TYPE_UNDEFINED;
-            free(removedNode->val);
-            removedNode->val = NULL;
-        }else{
-            list->head = list->head->next;
-        
-            clearNode(removedNode);
-        }
-
-        list->size--;
-        return removedValue;
-    }
+Node* removeFirstNodeFromList(LinkedList* list){
+    Node* removedNode = list->head;
+    list->head = removedNode->next;
+    return removedNode;
 }
 
-void* removeLastFromList(LinkedList* list){
-    if(list->size < 1){
-        puts("List is empty");
-        return NULL;
-    }else if(list->size == 1){
-        return removeFirstFromList(list);
+Node* removeLastNodeFromList(LinkedList* list){
+    if(list->size == 1){
+        return removeFirstNodeFromList(list);
     }else{
         Node* nxtToLast = getNodeFromList(list, list->size - 2);
-
         Node* removedNode = nxtToLast->next;
         nxtToLast->next = NULL;
-        void* removedValue = malloc(sizeof(removedNode->val));
-        memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
 
-        clearNode(removedNode);
-        list->size--;
-
-        return removedValue;
+        return removedNode;
     }
 }
 
 void* removeFromList(LinkedList* list, int index){
-    if(index >= list->size || index < list->size * -1){
-        puts("List index out of range");
+    if(index >= list->size || index < -1){
+        puts("List removal index out of range");
         return NULL;
     }
 
-    if(index < 0){
-        index += list->size;
-    }
-
-    Node* removedValue;
+    Node* removedNode;
 
     if(index == 0){
-        removedValue = removeFirstFromList(list);
-    }else if(index == list->size-1){
-        removedValue = removeLastFromList(list);
+        removedNode = removeFirstNodeFromList(list);
+    }else if(index == -1){
+        removedNode = removeLastNodeFromList(list);
     }else{
         Node* prev = getNodeFromList(list, index-1);
-        Node* removedNode = prev->next;
+        removedNode = prev->next;
         prev->next = removedNode->next;
-
-        removedValue = malloc(sizeof(removedNode->val));
-        memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
-
-        clearNode(removedNode);
-        list->size--;
     }
 
+    void* removedValue = removedNode->val;
+
+    //removedValue = malloc(sizeof(removedNode->val));
+    //memcpy(removedValue, removedNode->val, sizeof(removedNode->val));
+
+    //clearNode(removedNode);
+    free(removedNode);
+    list->size--;
     return removedValue;
+}
+
+/////////////////////////////////////    Get Method    ////////////////////////////////////////
+
+void* getValueFromList(LinkedList* list, int index){
+    Node* tmp = getNodeFromList(list, index);
+
+    if(tmp != NULL) return tmp->val;
+
+    return tmp;
 }
 
 ////////////////////////////////////    List Printing    //////////////////////////////////////
@@ -324,8 +296,6 @@ char* listToString(LinkedList* list){
 
     while(tmp != NULL){
         switch(tmp->type){
-            case TYPE_UNDEFINED:
-                break;
             case TYPE_INT:
                 int n = *(int*) tmp->val;
                 numToCharList(string, n, TYPE_INT);
@@ -351,7 +321,7 @@ char* listToString(LinkedList* list){
                 
                 break;
             case TYPE_STRUCT:
-                char* structStr = (char*) malloc(sizeof("struct@") + sizeof(void*));
+                char* structStr = (char*) malloc(sizeof("struct@") + 16);
                 sprintf(structStr, "struct@%p", tmp->val);
 
                 s = structStr;
@@ -371,15 +341,18 @@ char* listToString(LinkedList* list){
         tmp = tmp->next;
     }
 
-    removeLastFromList(string); // remove unwanted ','
-    removeLastFromList(string); // remove unwanted ' '
+    if(string->size > 1){
+        removeFromList(string, -1); // remove unwanted ','
+        removeFromList(string, -1); // remove unwanted ' '
+    }
+
     listInsertChar(string, ']', -1);
 
     char* returnedString = (char*) malloc(string->size + 1);
     returnedString[string->size] = '\0';
 
     for(int i = 0; string->size > 0; i++){
-        returnedString[i] = *(char*) removeFirstFromList(string);
+        returnedString[i] = *(char*) removeFromList(string, 0);
     }
 
     clearList(string);
@@ -387,7 +360,7 @@ char* listToString(LinkedList* list){
     return returnedString;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////    Converters    ////////////////////////////////////////
 
 int voidPointerToInt(void* value){
     if(value != NULL){
@@ -413,69 +386,24 @@ char voidPointerToChar(void* value){
     return 0;
 }
 
-void* getValueFromList(LinkedList* list, int index){
-    if(index > list->size-1 || index < 0){
-        puts("Index out of range");
-        return NULL;
-    }
-
-    Node* tmp = list->head;
-
-    for(int i = 0; i < index; i++){
-        tmp = tmp->next;
-    }
-
-    return tmp->val;
-}
-
 int main(){
     LinkedList* teste = LinkedListConstructor();
-
-    printf("%s\n", listToString(teste));
-
-    listInsertInt(teste, 154, -1);
-
-    printf("%s\n", listToString(teste));
-
-    listInsertChar(teste, 'a', -1);
-
-    printf("%s\n", listToString(teste));
-
-    listInsertDouble(teste, 3.14, -1);
-
-    printf("%s\n", listToString(teste));
-
-    listInsertString(teste, "Vina", -1);
-
-    printf("%s\n", listToString(teste));
-
-    int i = *(int*) removeFirstFromList(teste);
-    printf("removed: %d\n", i);
-
-    printf("%s\n", listToString(teste));
-
-    char* s = (char*) removeLastFromList(teste);
-    printf("removed: %s\n", s);
-
-    printf("%s\n", listToString(teste));
-
-    listInsertStruct(teste, LinkedListConstructor(), -1);
-
-    printf("%s\n", listToString(teste));
-
-    char n = *(char*) getValueFromList(teste, 0);
-    printf("%c\n", n);
-
-    double d = *(double*) removeFromList(teste, 1);
-    printf("Removed: %.2f\n%s\n%d", d, listToString(teste), teste->size);
+    LinkedList* teste2 = LinkedListConstructor();
 
     listInsertInt(teste, 7, -1);
+    listInsertDouble(teste, 3.14159, -1);
+    listInsertChar(teste, 'V', -1);
+    listInsertString(teste, "Vina", -1);
+    listInsertStruct(teste, teste2, -1);
+
+    listInsertInt(teste2, 3, 0);
+
     printf("%s\n", listToString(teste));
 
-    char sete = *(char*) removeFromList(teste, -4);
-    printf("removed: %c\n%s", sete, listToString(teste));
+    void* removed = removeFromList(teste, 3);
+    printf("%s\n", removed);
 
-    free(teste);
+    clearList(teste);
 
     return 0;
 }
