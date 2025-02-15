@@ -2,33 +2,26 @@
 #include "LinkedList/LinkedList.h"
 
 int main(){
-    LinkedList* teste = LinkedListConstructor();
-    LinkedList* teste2 = LinkedListConstructor();
+    LinkedList* list = LinkedListConstructor();
 
-    listInsertInt(teste2, 1, -1);
+    printf("%s\n", listToString(list));
 
-    listInsertInt(teste, 7, -1);
-    listInsertDouble(teste, 3.14159, -1);
-    listInsertChar(teste, 'V', -1);
-    listInsertString(teste, "Vina", -1);
-    listInsertStruct(teste, teste2, -1);
+    listInsertInt(list, 7, -1);
+    printf("%s\n", listToString(list));
 
-    listInsertInt(teste2, 2, -1);
+    listInsertDouble(list, 3.14159, -1);
+    printf("%s\n", listToString(list));
 
-    printf("%s\n", listToString(teste));
+    listInsertChar(list, 'V', -1);
+    printf("%s\n", listToString(list));
 
-    int* removedInt = listRemove(teste, 0);
-    printf("removed: %d\n\n", *removedInt);
+    listInsertString(list, "Neoni", -1);
+    printf("%s\n", listToString(list));
 
-    printf("%s\n", listToString(teste));
+    listInsertStruct(list, LinkedListConstructor(), -1);
+    printf("%s\n", listToString(list));
 
-    void* removedStruct = listRemove(teste, -1);
-    printf("removed: %s\n\n", listToString(removedStruct));
-
-    printf("%s\n", listToString(teste));
-
-    listClear(teste);
-    listClear(teste2);
+    listClear(list);
 
     return 0;
 }
