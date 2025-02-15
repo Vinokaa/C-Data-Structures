@@ -48,6 +48,8 @@ listInsertInt(list, 2, 0);
 listInsertInt(list, 5, 1);
 
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -74,6 +76,8 @@ listInsertDouble(list, 7.5, -1);
 listInsertDouble(list, 2, -1);
 
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -100,6 +104,8 @@ listInsertChar(list, 'i', 0);
 listInsertChar(list, 'v', 0);
 
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -124,6 +130,8 @@ listInsertString(list, "Matue", -1);
 listInsertString(list, "Neoni", 0);
 
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -165,6 +173,9 @@ printf("%s\n", listToString(removedList));
 
 void* removedCharacter = listGetValue(list1, 1);
 printf("%s from %s\n", removedCharacter->name, removedCharacter->origin);
+
+listClear(list1);
+listClear(list2);
 ```
 
 ```
@@ -203,6 +214,9 @@ void* removedList = listRemove(list1, -1);
 printf("removed: %s\n", listToString(removedList));
 
 printf("%s\n", listToString(list1));
+
+listClear(list1);
+listClear(list2);
 ```
 
 ```
@@ -243,6 +257,9 @@ void* retrievedList = listGetValue(list1, -1);
 printf("retrieved: %s\n", listToString(retrievedList));
 
 printf("%s\n", listToString(list1));
+
+listClear(list1);
+listClear(list2);
 ```
 
 ```
@@ -273,6 +290,8 @@ printf("%s\n", listToString(list));
 listChangeDoublePrintPrecision(5);
 
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -307,6 +326,8 @@ printf("%s\n", listToString(list));
 
 listInsertStruct(list, LinkedListConstructor(), -1);
 printf("%s\n", listToString(list));
+
+listClear(list);
 ```
 
 ```
@@ -316,6 +337,35 @@ printf("%s\n", listToString(list));
 [7, 3.14, V]
 [7, 3.14, V, Neoni]
 [7, 3.14, V, Neoni, struct@000001FD94F907F0]
+```
+
+<br>
+
+### _void_ listClear(_LinkedList* list_)
+
+Recursively `free()`s every Node of the list, then the list itself.
+
+1. _`LinkedList* list`_: A pointer to the list to be cleared
+
+```C
+LinkedList* list = LinkedListConstructor();
+
+listInsertInt(list, 7, -1);
+listInsertDouble(list, 3.14159, -1);
+listInsertChar(list, 'V', -1);
+listInsertString(list, "Neoni", -1);
+listInsertStruct(list, LinkedListConstructor(), -1);
+
+printf("%s\n", listToString(list));
+
+listClear(list);
+
+printf("%s\n", listToString(list));
+```
+
+```
+[7, 3.14, V, Neoni, struct@000002335960A120]
+*Program crashes because the memory addresses aren't allocated anymore*
 ```
 
 <br>
