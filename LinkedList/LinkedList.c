@@ -175,7 +175,7 @@ static Node* listInsert(LinkedList* list, int index){
     }else{
         new = (Node*) malloc(sizeof(Node));
 
-        Node* tmp = getNodeFromList(list, index);
+        Node* tmp = getNodeFromList(list, index-1);
 
         new->next = tmp->next;
         tmp->next = new;
