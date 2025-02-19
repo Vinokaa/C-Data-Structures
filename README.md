@@ -1,10 +1,10 @@
 # C Data Structures Library
 
-<p>
+<!--<p>
   <a href="https://github.com/Vinokaa/CDataStructures/blob/master/README.pt-br.md"> 
     <img src="https://img.shields.io/badge/lang-pt--br-green.svg">
   </a>
-</p>
+</p>-->
 
 <p align="center">
   <img width="550" height="400" src="https://github.com/user-attachments/assets/ea501ff2-3ff4-42a8-a610-db6db94b1f6b">
