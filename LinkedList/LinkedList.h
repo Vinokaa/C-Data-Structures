@@ -1,3 +1,6 @@
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
+
 typedef struct Node Node;
 typedef struct LinkedList LinkedList;
 
@@ -17,27 +20,20 @@ struct Node{
 
 struct LinkedList{
     int size;
+    unsigned short double_precision;
     Node* head;
+    void (*insertInt)(LinkedList* list, int n, int index);
+    void (*insertDouble)(LinkedList* list, double d, int index);
+    void (*insertChar)(LinkedList* list, char c, int index);
+    void (*insertString)(LinkedList* list, char* s, int index);
+    void (*insertStruct)(LinkedList* list, void* s, int index);
+    void* (*remove)(LinkedList* list, int index);
+    void* (*get)(LinkedList* list, int index);
+    void (*changeDoublePrintPrecision)(LinkedList* list, unsigned short n);
+    char* (*toString)(LinkedList* list);
+    void (*clear)(LinkedList* list);
 };
 
-void listClear(LinkedList* list);
+LinkedList LinkedListConstructor();
 
-LinkedList* LinkedListConstructor();
-
-void listInsertInt(LinkedList* list, int n, int index);
-
-void listInsertDouble(LinkedList* list, double d, int index);
-
-void listInsertChar(LinkedList* list, char c, int index);
-
-void listInsertString(LinkedList* list, char* s, int index);
-
-void listInsertStruct(LinkedList* list, void* s, int index);
-
-void* listRemove(LinkedList* list, int index);
-
-void* listGetValue(LinkedList* list, int index);
-
-void listChangeDoublePrintPrecision(unsigned short n);
-
-char* listToString(LinkedList* list);
+#endif
