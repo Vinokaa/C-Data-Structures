@@ -2,42 +2,20 @@
 #include "LinkedList/LinkedList.h"
 
 int main(){
-    LinkedList list = LinkedListConstructor();
+    LinkedList list1 = LinkedListConstructor();
     LinkedList list2 = LinkedListConstructor();
 
-    printf("%s\n", list.toString(&list));
+    list1.insertInt(&list1, 7, -1);
+    list1.insertDouble(&list1, 3.14159, -1);
+    list1.insertChar(&list1, 'V', -1);
+    list1.insertString(&list1, "Neoni", -1);
+    list1.insertStruct(&list1, &list2, -1);
 
-    list.insertInt(&list, 7, -1);
-    printf("%s\n", list.toString(&list));
+    printf("%s\n", list1.toString(&list1));
 
-    list.insertDouble(&list, 3.14159, -1);
-    printf("%s\n", list.toString(&list));
+    list1.clear(&list1);
 
-    list.insertChar(&list, 'V', -1);
-    printf("%s\n", list.toString(&list));
-
-    list.insertString(&list, "Neoni", -1);
-    printf("%s\n", list.toString(&list));
-
-    list.insertStruct(&list, &list2, -1);
-    printf("%s\n\n", list.toString(&list));
-
-    int* retrievedInt = list.get(&list, 0);
-    printf("retrieved: %d\n", *retrievedInt);
-
-    printf("%s\n\n", list.toString(&list));
-
-    double* removedDouble = list.remove(&list, 1);
-    printf("removed: %.5f\n", *removedDouble);
-
-    printf("%s\n\n", list.toString(&list));
-
-    LinkedList* removedList = list.remove(&list, -1);
-    printf("removed: %s\n", removedList->toString(removedList));
-
-    printf("%s\n", list.toString(&list));
-
-    list.clear(&list);
+    printf("%s\n", list1.toString(&list1));
 
     return 0;
 }

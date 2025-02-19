@@ -45,6 +45,7 @@ static void clearListRecursive(Node* node){
 
 static void listClear(LinkedList* list){
     clearListRecursive(list->head);
+    list->head = NULL;
 }
 
 static Node* getNodeFromList(LinkedList* list, int index){
