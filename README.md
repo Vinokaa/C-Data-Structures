@@ -45,7 +45,7 @@ LinkedList list = LinkedListConstructor();
 list.insertInt(&list, 3, 0);
 list.insertInt(&list, 7, -1);
 list.insertInt(&list, 2, 0);
-list.insertInt(&list, 5, 1);
+list.insertInt(&list, 5, 2);
 
 printf("%s\n", list.toString(&list));
 
