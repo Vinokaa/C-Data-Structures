@@ -11,6 +11,7 @@ static void listInsertInt(LinkedList* list, int n, int index);
 static void listInsertDouble(LinkedList* list, double d, int index);
 static void listInsertChar(LinkedList* list, char c, int index);
 static void listInsertString(LinkedList* list, char* s, int index);
+static void listInsertList(LinkedList* list, LinkedList* l, int index);
 static void listInsertStruct(LinkedList* list, void* s, int index);
 
 static void* listRemove(LinkedList* list, int index);
@@ -113,6 +114,7 @@ LinkedList LinkedListConstructor(){
                         &listInsertDouble,
                         &listInsertChar,
                         &listInsertString,
+                        &listInsertList,
                         &listInsertStruct,
                         &listRemove,
                         &listGetValue,
@@ -212,6 +214,12 @@ static void listInsertString(LinkedList* list, char* s, int index){
     new->val = s;
 }
 
+static void listInsertList(LinkedList* list, LinkedList* l, int index){
+    Node* new = listInsert(list, index);
+    new->type = TYPE_LIST;
+    new->val = l;
+}
+
 static void listInsertStruct(LinkedList* list, void* s, int index){
     Node* new = listInsert(list, index);
     new->type = TYPE_STRUCT;
@@ -306,6 +314,16 @@ static char* listToString(LinkedList* list){
                 break;
             case TYPE_STRING:
                 s = (char*) tmp->val;
+
+                while(*s != '\0'){
+                    string.insertChar(&string, *s, -1);
+                    s++;
+                }
+                
+                break;
+            case TYPE_LIST:
+                LinkedList* l = tmp->val;
+                s = (char*) l->toString(l);
 
                 while(*s != '\0'){
                     string.insertChar(&string, *s, -1);

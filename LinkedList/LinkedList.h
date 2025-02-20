@@ -9,6 +9,7 @@ typedef enum{
     TYPE_FLOAT,
     TYPE_CHAR,
     TYPE_STRING,
+    TYPE_LIST,
     TYPE_STRUCT
 } type_t;
 
@@ -26,6 +27,7 @@ struct LinkedList{
     void (*insertDouble)(LinkedList* list, double d, int index);
     void (*insertChar)(LinkedList* list, char c, int index);
     void (*insertString)(LinkedList* list, char* s, int index);
+    void (*insertList)(LinkedList* list, LinkedList* l, int index);
     void (*insertStruct)(LinkedList* list, void* s, int index);
     void* (*remove)(LinkedList* list, int index);
     void* (*get)(LinkedList* list, int index);

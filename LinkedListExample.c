@@ -5,6 +5,9 @@ int main(){
     LinkedList list = LinkedListConstructor();
     LinkedList list2 = LinkedListConstructor();
 
+    list2.insertInt(&list2, 47, -1);
+    list2.insertDouble(&list2, 23.26, -1);
+
     printf("%s\n", list.toString(&list));
 
     list.insertInt(&list, 7, -1);
@@ -19,7 +22,7 @@ int main(){
     list.insertString(&list, "Neoni", -1);
     printf("%s\n", list.toString(&list));
 
-    list.insertStruct(&list, &list2, -1);
+    list.insertList(&list, &list2, -1);
     printf("%s\n\n", list.toString(&list));
 
     int* retrievedInt = list.get(&list, 0);
