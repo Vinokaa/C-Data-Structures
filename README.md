@@ -62,7 +62,7 @@ list.clear(&list);
 
 Adds one Node storing the _`double d`_ given as a parameter to the Linked List.
 
-The original fractional part of _`double d`_ won't be lost, but when printing using [`listToString()`](#char-listtostringlinkedlist-list), the fractional portion will be limited by a variable, which can be changed with [`LinkedList.changeDoublePrintPrecision()`](#void-linkedlistchangedoubleprintprecisionlinkedlist-list-unsigned-short-n).
+The original fractional part of _`double d`_ won't be lost, but when printing using [`LinkedList.listToString()`](#char-listtostringlinkedlist-list), the fractional portion will be limited by a variable, which can be changed with [`LinkedList.changeDoublePrintPrecision()`](#void-linkedlistchangedoubleprintprecisionlinkedlist-list-unsigned-short-n).
 
 1. _`LinkedList* list`_: A pointer to the Linked List where _`double d`_ will be stored
 2. _`double d`_: The double value to be stored
@@ -140,11 +140,52 @@ list.clear(&list);
 
 <br>
 
+### _void_ LinkedList.insertList(_LinkedList* list, LinkedList* l, int index_)
+
+Adds, to the Linked List, one Node storing another LinkedList given as a parameter.
+
+1. _`LinkedList* list`_: A pointer to the Linked List where _`LinkedList* l`_ will be stored
+2. _`LinkedList* l`_: The LinkedList to be stored
+3. _`int index`_: The index (from $-1$ to $list.size$), being $-1$ to insert at the end, $0$ at the start, and $\ge1$ the index of the Node when it gets inserted
+
+```C
+LinkedList list1 = LinkedListConstructor();
+LinkedList list2 = LinkedListConstructor();
+LinkedList list3 = LinkedListConstructor();
+
+list1.insertList(&list1, &list2, -1);
+list1.insertList(&list1, &list3, -1);
+
+printf("%s\n", list1.toString(&list1));
+
+list2.insertInt(&list2, 7, -1);
+
+list3.insertDouble(&list3, 125.5, -1);
+list3.insertChar(&list3, 'I', -1);
+
+printf("%s\n", list1.toString(&list1));
+
+LinkedList* removedList = list1.get(&list1, 0);
+printf("removed: %s\n", removedList->toString(removedList));
+
+list1.clear(&list1);
+list2.clear(&list2);
+list3.clear(&list3);
+```
+
+```
+[[], []]
+[[7], [125.5, I]]
+removed: [7]
+```
+
+<br>
+
 ### _void_ LinkedList.insertStruct(_LinkedList* list, void* s, int index_)
 
 Adds one Node storing any type of struct given as a parameter to the Linked List.
 
-1. _`LinkedList* list`_: A pointer to the Linked List where _`char* s`_ will be stored
+1. _`LinkedList* list`_: A pointer to the Linked List where _`void* s`_ will be stored (void* is a generic pointer, meaning that it can be a pointer to any type of struct)
 2. _`void* s`_: The struct to be stored
 3. _`int index`_: The index (from $-1$ to $list.size$), being $-1$ to insert at the end, $0$ at the start, and $\ge1$ the index of the Node when it gets inserted
 
@@ -158,29 +199,20 @@ Character* elliot = (Character*) malloc(sizeof(Character));
 elliot->name = "Elliot Alderson";
 elliot->origin = "Mr. Robot";
 
-LinkedList list1 = LinkedListConstructor();
-LinkedList list2 = LinkedListConstructor();
+LinkedList list = LinkedListConstructor();
 
-list1.insertStruct(&list1, &list2, -1);
-list1.insertStruct(&list1, elliot, -1);
+list.insertStruct(&list, elliot, -1);
 
-list2.insertInt(&list2, 7, -1);
+printf("%s\n", list.toString(&list));
 
-printf("%s\n", list1.toString(&list1));
-
-LinkedList* removedList = list1.get(&list1, 0);
-printf("%s\n", removedList->toString(removedList));
-
-Character* removedCharacter = list1.get(&list1, 1);
+Character* removedCharacter = list.get(&list, 0);
 printf("%s from %s\n", removedCharacter->name, removedCharacter->origin);
 
-list1.clear(&list1);
-list2.clear(&list2);
+list.clear(&list);
 ```
 
 ```
-[struct@000001582723A120, struct@00000237C7209FE0]
-[7]
+[struct@000001582723A120]
 Elliot Alderson from Mr. Robot
 ```
 
@@ -201,7 +233,7 @@ LinkedList list2 = LinkedListConstructor();
 
 list1.insertInt(&list1, 7, -1);
 list1.insertDouble(&list1, 3.14, -1);
-list1.insertStruct(&list1, &list2, -1);
+list1.insertList(&list1, &list2, -1);
 
 printf("%s\n", list1.toString(&list1));
 
@@ -220,9 +252,9 @@ list2.clear(&list2);
 ```
 
 ```
-[7, 3.14, struct@00000261EB80A080]
+[7, 3.14, []]
 removed: 7
-[3.14, struct@00000261EB80A080]
+[3.14, []]
 removed: []
 [3.14]
 ```
@@ -244,7 +276,7 @@ LinkedList list2 = LinkedListConstructor();
 
 list1.insertInt(&list1, 7, -1);
 list1.insertDouble(&list1, 3.14, -1);
-list1.insertStruct(&list1, &list2, -1);
+list1.insertList(&list1, &list2, -1);
 
 printf("%s\n", list1.toString(&list1));
 
@@ -263,11 +295,11 @@ list2.clear(&list2);
 ```
 
 ```
-[7, 3.14, struct@00000261EB80A080]
+[7, 3.14, []]
 retrieved: 7
-[7, 3.14, struct@00000261EB80A080]
+[7, 3.14, []]
 retrieved: []
-[7, 3.14, struct@00000261EB80A080]
+[7, 3.14, []]
 ```
 
 <br>
@@ -326,7 +358,7 @@ printf("%s\n", list1.toString(&list1));
 list1.insertString(&list1, "Neoni", -1);
 printf("%s\n", list1.toString(&list1));
 
-list1.insertStruct(&list1, &list2, -1);
+list1.insertList(&list1, &list2, -1);
 printf("%s\n", list1.toString(&list1));
 
 list1.clear(&list1);
@@ -338,7 +370,7 @@ list1.clear(&list1);
 [7, 3.14]
 [7, 3.14, V]
 [7, 3.14, V, Neoni]
-[7, 3.14, V, Neoni, struct@000001FD94F907F0]
+[7, 3.14, V, Neoni, []]
 ```
 
 <br>
@@ -357,7 +389,7 @@ list1.insertInt(&list1, 7, -1);
 list1.insertDouble(&list1, 3.14159, -1);
 list1.insertChar(&list1, 'V', -1);
 list1.insertString(&list1, "Neoni", -1);
-list1.insertStruct(&list1, &list2, -1);
+list1.insertList(&list1, &list2, -1);
 
 printf("%s\n", list1.toString(&list1));
 
@@ -367,7 +399,7 @@ printf("%s\n", list1.toString(&list1));
 ```
 
 ```
-[7, 3.14, V, Neoni, struct@000002335960A120]
+[7, 3.14, V, Neoni, []]
 []
 ```
 
