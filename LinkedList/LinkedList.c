@@ -323,7 +323,7 @@ static char* listToString(LinkedList* list){
                 break;
             case TYPE_LIST:
                 LinkedList* l = tmp->val;
-                s = (char*) l->toString(l);
+                s = l->toString(l);
 
                 while(*s != '\0'){
                     string.insertChar(&string, *s, -1);
