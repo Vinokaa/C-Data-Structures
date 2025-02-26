@@ -38,4 +38,6 @@ struct LinkedList{
 
 LinkedList LinkedListConstructor();
 
+LinkedList* LinkedListHeapConstructor();
+
 #endif

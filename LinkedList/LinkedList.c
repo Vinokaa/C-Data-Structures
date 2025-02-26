@@ -125,6 +125,27 @@ LinkedList LinkedListConstructor(){
     return list;
 }
 
+LinkedList* LinkedListHeapConstructor(){
+    LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+
+    list->size = 0;
+    list->double_precision = 2;
+    list->head = NULL;
+    list->insertInt = &listInsertInt;
+    list->insertDouble = &listInsertDouble;
+    list->insertChar = &listInsertChar;
+    list->insertString = &listInsertString;
+    list->insertList = &listInsertList;
+    list->insertStruct = &listInsertStruct;
+    list->remove = &listRemove;
+    list->get = &listGetValue;
+    list->changeDoublePrintPrecision = &listChangeDoublePrintPrecision;
+    list->toString = &listToString;
+    list->clear = &listClear;
+
+    return list;
+}
+
 /////////////////////////////////    List Insert Functions    /////////////////////////////////
 
 static Node* listInsertFirst(LinkedList* list){
