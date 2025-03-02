@@ -19,14 +19,30 @@ The libraries in this repository were made from an idea to make all data structu
 
 ## Linked List
 
-### _LinkedList*_ LinkedListConstructor()
+### _LinkedList_ LinkedListConstructor()
 
-Initializes the linked list, allocating memory for it using `malloc()`, setting its size to `0` and its head to `NULL`.
+Initializes the linked list, allocating memory for it in the stack, setting its size to `0` and its head to `NULL`.
+
+Returns an initialized LinkedList struct.
+
+> It is recommended to be used instead of [`LinkedListHeapConstructor()`](#linkedlist-linkedlistheapconstructor) inside of functions other than `main()`, since the memory allocated for it gets out of scope once the function returns. Just make sure to always [`LinkedList.clear()`](#void-linkedlistclearlinkedlist-list) before returning from the function, since the Nodes are always allocated in the heap, and not clearing the List will result in a lost pointer.
+
+```C
+LinkedList list = LinkedListConstructor();
+```
+
+<br>
+
+### _LinkedList*_ LinkedListHeapConstructor()
+
+Initializes the linked list, allocating memory for it in the heap using `malloc()`, setting its size to `0` and its head to `NULL`.
 
 Returns a pointer to the memory address where the Linked List was allocated.
 
+> The user can and should `free()` the Linked List created with this function when it's not needed anymore. Always use [`LinkedList.clear()`](#void-linkedlistclearlinkedlist-list) before `free()`ing the Linked List itself.
+
 ```C
-LinkedList* list = LinkedListConstructor();
+LinkedList* list = LinkedListHeapConstructor();
 ```
 
 <br>
