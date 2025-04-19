@@ -467,5 +467,3 @@ free(list_print);
 ```
 
 <br>
-
-## Work In Progress
