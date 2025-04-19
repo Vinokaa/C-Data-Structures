@@ -68,7 +68,7 @@ static Node* getNodeFromList(LinkedList* list, int index){
 
 static void numToCharList(LinkedList* dest, double d, type_t type){
     if(type == TYPE_INT || type == TYPE_FLOAT){
-        LinkedList list = LinkedListConstructor();
+        LinkedList* list = LinkedListConstructor();
         int n;
 
         if(type == TYPE_FLOAT){
@@ -79,22 +79,22 @@ static void numToCharList(LinkedList* dest, double d, type_t type){
             n = (int) d;
 
             for(int i = 0; i < dest->double_precision; i++){
-                list.insertChar(&list, n % 10 + 48, -1);
+                list->insertChar(list, n % 10 + 48, -1);
                 n = (int) (n / 10);
             }
 
-            list.insertChar(&list, '.', -1);
+            list->insertChar(list, '.', -1);
         }else{
             n = (int) d;
         }
 
         while(n > 0){
-            list.insertChar(&list, n % 10 + 48, -1);
+            list->insertChar(list, n % 10 + 48, -1);
             n = (int) (n / 10);
         }
 
-        while(list.size > 0){
-            char c = *(char*) list.remove(&list, -1);
+        while(list->size > 0){
+            char c = *(char*) list->remove(list, -1);
             dest->insertChar(dest, c, -1);
         }
     }
@@ -104,29 +104,10 @@ static void numToCharList(LinkedList* dest, double d, type_t type){
 //                                       Main Functions                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////    Constructors    /////////////////////////////////////
+//////////////////////////////////////    Constructor    //////////////////////////////////////
 
-LinkedList LinkedListConstructor(){
-    LinkedList list = { 0,
-                        2,
-                        NULL,
-                        &listInsertInt,
-                        &listInsertDouble,
-                        &listInsertChar,
-                        &listInsertString,
-                        &listInsertList,
-                        &listInsertStruct,
-                        &listRemove,
-                        &listGetValue,
-                        &listChangeDoublePrintPrecision,
-                        &listToString,
-                        &listClear };
-
-    return list;
-}
-
-LinkedList* LinkedListHeapConstructor(){
-    LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+LinkedList* LinkedListConstructor(){
+    LinkedList* list = malloc(sizeof(LinkedList));
 
     list->size = 0;
     list->double_precision = 2;
@@ -153,11 +134,11 @@ static Node* listInsertFirst(LinkedList* list){
     Node* new;
 
     if(head == NULL){
-        list->head = (Node*) malloc(sizeof(Node));
+        list->head = malloc(sizeof(Node));
         list->head->next = NULL;
         new = list->head;
     }else{
-        new = (Node*) malloc(sizeof(Node));
+        new = malloc(sizeof(Node));
         new->next = head;
         list->head = new;
     }
@@ -172,7 +153,7 @@ static Node* listInsertLast(LinkedList* list){
     if(head == NULL){
         new = listInsertFirst(list);
     }else{
-        new = (Node*) malloc(sizeof(Node));
+        new = malloc(sizeof(Node));
         new->next = NULL;
 
         Node* tmp = getNodeFromList(list, list->size-1);
@@ -196,7 +177,7 @@ static Node* listInsert(LinkedList* list, int index){
     }else if(index == -1){
         new = listInsertLast(list);
     }else{
-        new = (Node*) malloc(sizeof(Node));
+        new = malloc(sizeof(Node));
 
         Node* tmp = getNodeFromList(list, index-1);
 
@@ -232,7 +213,8 @@ static void listInsertChar(LinkedList* list, char c, int index){
 static void listInsertString(LinkedList* list, char* s, int index){
     Node* new = listInsert(list, index);
     new->type = TYPE_STRING;
-    new->val = s;
+    new->val = malloc(strlen(s) + 1);
+    strcpy(new->val, s);
 }
 
 static void listInsertList(LinkedList* list, LinkedList* l, int index){
@@ -309,10 +291,10 @@ static void listChangeDoublePrintPrecision(LinkedList* list, unsigned short n){
 }
 
 static char* listToString(LinkedList* list){
-    LinkedList string = LinkedListConstructor();
-    string.changeDoublePrintPrecision(&string, list->double_precision);
+    LinkedList* string = LinkedListConstructor();
+    string->changeDoublePrintPrecision(string, list->double_precision);
     char* s;
-    string.insertChar(&string, '[', -1);
+    string->insertChar(string, '[', -1);
 
     Node* tmp = list->head;
 
@@ -320,24 +302,24 @@ static char* listToString(LinkedList* list){
         switch(tmp->type){
             case TYPE_INT:
                 int n = *(int*) tmp->val;
-                numToCharList(&string, n, TYPE_INT);
+                numToCharList(string, n, TYPE_INT);
                 
                 break;
             case TYPE_FLOAT:
                 double d = *(double*) tmp->val;
-                numToCharList(&string, d, TYPE_FLOAT);
+                numToCharList(string, d, TYPE_FLOAT);
 
                 break;
             case TYPE_CHAR:
                 char c = *(char*) tmp->val;
-                string.insertChar(&string, c, -1);
+                string->insertChar(string, c, -1);
 
                 break;
             case TYPE_STRING:
                 s = (char*) tmp->val;
 
                 while(*s != '\0'){
-                    string.insertChar(&string, *s, -1);
+                    string->insertChar(string, *s, -1);
                     s++;
                 }
                 
@@ -347,19 +329,19 @@ static char* listToString(LinkedList* list){
                 s = l->toString(l);
 
                 while(*s != '\0'){
-                    string.insertChar(&string, *s, -1);
+                    string->insertChar(string, *s, -1);
                     s++;
                 }
                 
                 break;
             case TYPE_STRUCT:
-                char* structStr = (char*) malloc(sizeof("struct@") + 16);
+                char* structStr = malloc(sizeof("struct@") + 16);
                 sprintf(structStr, "struct@%p", tmp->val);
 
                 s = structStr;
 
                 while(*s != '\0'){
-                    string.insertChar(&string, *s, -1);
+                    string->insertChar(string, *s, -1);
                     s++;
                 }
 
@@ -368,23 +350,23 @@ static char* listToString(LinkedList* list){
                 break;
         }
         
-        string.insertChar(&string, ',', -1);
-        string.insertChar(&string, ' ', -1);
+        string->insertChar(string, ',', -1);
+        string->insertChar(string, ' ', -1);
         tmp = tmp->next;
     }
 
-    if(string.size > 1){
-        string.remove(&string, -1); // remove unwanted ','
-        string.remove(&string, -1); // remove unwanted ' '
+    if(string->size > 1){
+        string->remove(string, -1); // remove unwanted ','
+        string->remove(string, -1); // remove unwanted ' '
     }
 
-    string.insertChar(&string, ']', -1);
+    string->insertChar(string, ']', -1);
 
-    char* returnedString = (char*) malloc(string.size + 1);
-    returnedString[string.size] = '\0';
+    char* returnedString = malloc(string->size + 1);
+    returnedString[string->size] = '\0';
 
-    for(int i = 0; string.size > 0; i++){
-        returnedString[i] = *(char*) string.remove(&string, 0);
+    for(int i = 0; string->size > 0; i++){
+        returnedString[i] = *(char*) string->remove(string, 0);
     }
 
     return returnedString;

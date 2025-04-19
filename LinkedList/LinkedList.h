@@ -36,8 +36,6 @@ struct LinkedList{
     void (*clear)(LinkedList* list);
 };
 
-LinkedList LinkedListConstructor();
-
-LinkedList* LinkedListHeapConstructor();
+LinkedList* LinkedListConstructor();
 
 #endif
