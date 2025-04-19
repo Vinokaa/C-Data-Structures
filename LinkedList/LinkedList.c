@@ -350,14 +350,15 @@ static char* listToString(LinkedList* list){
                 break;
         }
         
+
         string->insertChar(string, ',', -1);
         string->insertChar(string, ' ', -1);
         tmp = tmp->next;
     }
 
     if(string->size > 1){
-        string->remove(string, -1); // remove unwanted ','
         string->remove(string, -1); // remove unwanted ' '
+        string->remove(string, -1); // remove unwanted ','
     }
 
     string->insertChar(string, ']', -1);
@@ -365,9 +366,15 @@ static char* listToString(LinkedList* list){
     char* returnedString = malloc(string->size + 1);
     returnedString[string->size] = '\0';
 
+    char* c_pointer;
+
     for(int i = 0; string->size > 0; i++){
-        returnedString[i] = *(char*) string->remove(string, 0);
+        c_pointer = string->remove(string, 0);
+        returnedString[i] = *c_pointer;
+        free(c_pointer);
     }
+
+    free(string);
 
     return returnedString;
 }
