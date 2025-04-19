@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "LinkedList.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +95,9 @@ static void numToCharList(LinkedList* dest, double d, type_t type){
         }
 
         while(list->size > 0){
-            char c = *(char*) list->remove(list, -1);
-            dest->insertChar(dest, c, -1);
+            char* c_pointer = (char*) list->remove(list, -1);
+            dest->insertChar(dest, *c_pointer, -1);
+            free(c_pointer);
         }
     }
 }
@@ -326,16 +328,19 @@ static char* listToString(LinkedList* list){
                 break;
             case TYPE_LIST:
                 LinkedList* l = tmp->val;
-                s = l->toString(l);
+                char* l_start = l->toString(l);
+                s = l_start;
 
                 while(*s != '\0'){
                     string->insertChar(string, *s, -1);
                     s++;
                 }
+
+                free(l_start);
                 
                 break;
             case TYPE_STRUCT:
-                char* structStr = malloc(sizeof("struct@") + 16);
+                char structStr[24];
                 sprintf(structStr, "struct@%p", tmp->val);
 
                 s = structStr;
@@ -345,12 +350,9 @@ static char* listToString(LinkedList* list){
                     s++;
                 }
 
-                free(structStr);
-
                 break;
         }
         
-
         string->insertChar(string, ',', -1);
         string->insertChar(string, ' ', -1);
         tmp = tmp->next;
