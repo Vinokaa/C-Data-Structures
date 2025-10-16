@@ -4,11 +4,23 @@
 #include <math.h>
 #include "LinkedList.h"
 
-typedef struct SizeList SizeList;
+typedef enum{
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_CHAR,
+    TYPE_STRING,
+    TYPE_LIST,
+    TYPE_STRUCT
+} type_t;
 
-struct SizeList{
-    long* val;
-    SizeList* next;
+struct Node{
+    type_t type;
+    Node* next;
+};
+
+struct ListNode{
+    LinkedList* val;
+    ListNode* next;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,12 +54,12 @@ LinkedList* LinkedListConstructor(){
     LinkedList* list = malloc(sizeof(LinkedList));
 
     list->size = 0;
-    list->strSize = 3; // [] + '\0'
     list->head = NULL;
     list->tail = NULL;
 
     list->_sizeFixedAmount = 0;
     list->_sizeDoubleAmount = 0;
+    list->_internalLists = NULL;
     list->insertInt = &listInsertInt;
     list->insertDouble = &listInsertDouble;
     list->insertChar = &listInsertChar;
@@ -67,7 +79,6 @@ LinkedList* LinkedListConstructor(){
 ///////////////////////////////////    Static Attributes    ///////////////////////////////////
 
 static unsigned short double_precision = 2;
-SizeList* internalListsSizePointers = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                                  Complementary Functions                                  //
@@ -134,6 +145,41 @@ static char* doubleToCharAppend(char* _Dst, double d){
     return _Dst + size;
 }
 
+void internalListsAppend(LinkedList* _Dst, LinkedList* l){
+    ListNode* new = malloc(sizeof(ListNode));
+    new->val = l;
+    new->next = NULL;
+
+    if(_Dst->_internalLists == NULL){
+        _Dst->_internalLists = new;
+    }else{
+        ListNode* tmp = _Dst->_internalLists;
+
+        for(;tmp->next != NULL; tmp = tmp->next);
+
+        tmp->next = new;
+    }
+}
+
+void internalListsRemove(LinkedList* _Dst, LinkedList* l){
+    // Since this function is only called from inside listRemove() function,
+    // it assumes that the internal list to be removed is stored in _Dst->_internalLists.
+    
+    ListNode* tmp = _Dst->_internalLists;
+
+    if(tmp->val == l){
+        _Dst->_internalLists = _Dst->_internalLists->next;
+        free(tmp);
+    }else{
+        for(;tmp->next->val != l; tmp = tmp->next);
+
+        ListNode* removedNode = tmp->next;
+        tmp->next = removedNode->next;
+
+        free(removedNode);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                                       Main Functions                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,8 +232,6 @@ static Node* listInsert(LinkedList* list, Node* new, int index){
 
     list->size++;
 
-    if(list->size > 1) list->strSize += 2; // consider every ", " needed to print
-
     return new;
 }
 
@@ -228,8 +272,8 @@ static void listInsertList(LinkedList* list, LinkedList* l, int index){
     Node* new = malloc(sizeof(Node) + sizeof(LinkedList*));
     listInsert(list, new, index);
     new->type = TYPE_LIST;
-    LinkedList** tmp = (LinkedList**) (new+1);
-    *tmp = l;
+    *(LinkedList**) (new+1) = l;
+    internalListsAppend(list, l);
 }
 
 static void listInsertStruct(LinkedList* list, void* s, int index){
@@ -237,7 +281,7 @@ static void listInsertStruct(LinkedList* list, void* s, int index){
     listInsert(list, new, index);
     new->type = TYPE_STRUCT;
     *(void**) (new+1) = s;
-    list->_sizeFixedAmount += 16; // See listToString() implementation to understand how structs are printed
+    list->_sizeFixedAmount += 23; // See listToString() implementation to understand how structs are printed
 }
 
 /////////////////////////////////    List Remove Functions    /////////////////////////////////
@@ -280,24 +324,31 @@ static void* listRemove(LinkedList* list, void* _Dst, int index){
 
     switch(removedNode->type){
         case TYPE_CHAR:
-            memcpy(_Dst, removedNode+1, sizeof(char));
-            list->strSize -= 1;
+            *(char*) _Dst = *(char*) (removedNode+1);
+            list->_sizeFixedAmount -= 1;
             break;
         case TYPE_INT:
-            memcpy(_Dst, removedNode+1, sizeof(int));
-            list->strSize -= (int) log10(*(int*) _Dst) + 1;
+            *(int*) _Dst = *(int*) (removedNode+1);
+            list->_sizeFixedAmount -= (int) log10(*(int*) _Dst) + 1;
             break;
         case TYPE_FLOAT:
-            memcpy(_Dst, removedNode+1, sizeof(double));
+            *(double*) _Dst = *(double*) (removedNode+1);
+            list->_sizeFixedAmount -= (int) log10(*(int*) _Dst) + 1;
+            list->_sizeDoubleAmount -= 1;
             break;
-        default:
-            _Dst = removedNode+1;
+        case TYPE_STRING:
+            _Dst = *(char**) (removedNode+1);
+            break;
+        case TYPE_LIST:
+            _Dst = *(LinkedList**) (removedNode+1);
+            break;
+        case TYPE_STRUCT:
+            _Dst = *(void**) (removedNode+1);
             break;
     }
 
     free(removedNode);
     list->size--;
-    if(list->size > 0) list->strSize -= 2; // consider every ", " needed to print
 
     return _Dst;
 }
@@ -316,7 +367,13 @@ static void* listGetValue(LinkedList* list, int index){
 
 static long listGetStrSize(LinkedList* list){
     long comma_space_amount = list->size ? list->size-1 : 0;
-    return (long)(list->_sizeFixedAmount + list->_sizeDoubleAmount * (1 + double_precision) + 2 * comma_space_amount + 3);
+    long internalListsSize = 0;
+
+    for(ListNode* tmp = list->_internalLists; tmp != NULL; tmp = tmp->next){
+        internalListsSize += listGetStrSize(tmp->val) - 1;
+    }
+
+    return (long)(list->_sizeFixedAmount + list->_sizeDoubleAmount * (1 + double_precision) + 2 * comma_space_amount + internalListsSize + 3);
 }
 
 static void listChangeDoublePrintPrecision(LinkedList* list, unsigned short n){

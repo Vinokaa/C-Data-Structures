@@ -1,31 +1,17 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-typedef struct Node Node;
 typedef struct LinkedList LinkedList;
-typedef union Value Value;
-
-typedef enum{
-    TYPE_INT,
-    TYPE_FLOAT,
-    TYPE_CHAR,
-    TYPE_STRING,
-    TYPE_LIST,
-    TYPE_STRUCT
-} type_t;
-
-struct Node{
-    type_t type;
-    Node* next;
-};
+typedef struct Node Node;
+typedef struct ListNode ListNode;
 
 struct LinkedList{
     long size;
-    long strSize;
     Node* head;
     Node* tail;
     long _sizeFixedAmount;
     int _sizeDoubleAmount;
+    ListNode* _internalLists;
     void (*insertInt)(LinkedList* list, int n, int index);
     void (*insertDouble)(LinkedList* list, double d, int index);
     void (*insertChar)(LinkedList* list, char c, int index);
