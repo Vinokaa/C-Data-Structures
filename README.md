@@ -15,7 +15,9 @@
 
 # Documentation
 
-The libraries in this repository were made from an idea to make all data structures in C (I swear I'm not going insane), and make their usage feel as close as possible to an Object Oriented perspective.
+The libraries in this repository were made from an idea to make all data structures in C (I swear I'm not going insane), and initially make their usage feel as close as possible to an Object Oriented perspective [1].
+
+> [1] I gave up on the idea of making their usage feel as close as possible to an Object Oriented perspective, because implementing OO in C requires structs to store one pointer to each method, wasting a lot of memory, and alternatives to that (like storing the pointers to methods in a static methods struct, then having one pointer in every class point to it) require more writing from the person using this library.
 
 <br>
 
