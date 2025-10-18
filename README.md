@@ -27,6 +27,8 @@ The libraries in this repository were made from an idea to make all data structu
 
 Values starting with _ (underscore) stored inside the LinkedList struct shouldn't be modified externally. These values are only used internally, e.g. `ListNode* _internalLists` is a list that stores pointers to the internal lists, so that the `list->getStrSize()` function knows how many bytes to allocate in order to print the whole list.
 
+<br>
+
 ### _LinkedList*_ LinkedListConstructor()
 
 Initializes the linked list, allocating memory for it in the heap, setting its size to `0` and its head to `NULL`.
