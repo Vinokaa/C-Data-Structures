@@ -9,7 +9,7 @@
 <!-- teste -->
 
 <p align="center">
-  <img width="550" height="400" src="https://github.com/user-attachments/assets/ea501ff2-3ff4-42a8-a610-db6db94b1f6b">
+  <img width="500" height="450" src="https://github.com/user-attachments/assets/ea501ff2-3ff4-42a8-a610-db6db94b1f6b">
 </p>
 
 
@@ -17,11 +17,15 @@
 
 The libraries in this repository were made from an idea to make all data structures in C (I swear I'm not going insane), and initially make their usage feel as close as possible to an Object Oriented perspective [1].
 
-> [1] I gave up on the idea of making their usage feel as close as possible to an Object Oriented perspective, because implementing OO in C requires structs to store one pointer to each method, wasting a lot of memory, and alternatives to that (like storing the pointers to methods in a static methods struct, then having one pointer in every class point to it) require more writing from the person using this library.
+> [1] I'll be removing the Object Oriented perspective in the near future, because implementing OO in C requires structs to store one pointer to each method, wasting a lot of memory, and alternatives to that (like storing the pointers to methods in a static methods struct, then having one pointer in every class point to it) require more writing from the person using this library.
 
 <br>
 
 ## Linked List
+
+### Important Notes
+
+Values starting with _ (underscore) stored inside the LinkedList struct shouldn't be modified externally. These values are only used internally, e.g. `ListNode* _internalLists` is a list that stores pointers to the internal lists, so that the `list->getStrSize()` function knows how many bytes to allocate in order to print the whole list.
 
 ### _LinkedList*_ LinkedListConstructor()
 
@@ -53,8 +57,26 @@ list->insertInt(list, 7, -1);
 list->insertInt(list, 2, 0);
 list->insertInt(list, 5, 2);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list->getStrSize(list)];
+printf("%s\n", list->toString(list));
+
+list->clear(list);
+```
+
+or
+
+```C
+LinkedList* list = LinkedListConstructor();
+
+list->insertInt(list, 3, 0);
+list->insertInt(list, 7, -1);
+list->insertInt(list, 2, 0);
+list->insertInt(list, 5, 2);
+
+// heap-allocated string
+char* list_print = malloc(list->getStrSize(list));
+printf("%s\n", list->toString(list));
 free(list_print);
 
 list->clear(list);
@@ -83,8 +105,25 @@ list->insertDouble(list, 3.14159, -1);
 list->insertDouble(list, 7.5, -1);
 list->insertDouble(list, 2, -1);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list->getStrSize(list)];
+printf("%s\n", list->toString(list));
+
+list->clear(list);
+```
+
+or
+
+```C
+LinkedList* list = LinkedListConstructor();
+
+list->insertDouble(list, 3.14159, -1);
+list->insertDouble(list, 7.5, -1);
+list->insertDouble(list, 2, -1);
+
+// heap-allocated string
+char* list_print = malloc(list->getStrSize(list));
+printf("%s\n", list->toString(list));
 free(list_print);
 
 list->clear(list);
@@ -113,8 +152,26 @@ list->insertChar(list, 'n', 0);
 list->insertChar(list, 'i', 0);
 list->insertChar(list, 'v', 0);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list->getStrSize(list)];
+printf("%s\n", list->toString(list));
+
+list->clear(list);
+```
+
+or
+
+```C
+LinkedList* list = LinkedListConstructor();
+
+list->insertChar(list, 'a', 0);
+list->insertChar(list, 'n', 0);
+list->insertChar(list, 'i', 0);
+list->insertChar(list, 'v', 0);
+
+// heap-allocated string
+char* list_print = malloc(list->getStrSize(list));
+printf("%s\n", list->toString(list));
 free(list_print);
 
 list->clear(list);
@@ -137,19 +194,36 @@ Adds one Node storing the _`char* s`_ given as a parameter to the Linked List.
 ```C
 LinkedList* list = LinkedListConstructor();
 
-list->insertString(list, "AViVA", 0);
+list->insertString(list, "Dua Lipa", 0);
 list->insertString(list, "Matue", -1);
-list->insertString(list, "Neoni", 0);
+list->insertString(list, "Neoni", 1);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list->getStrSize(list)];
+printf("%s\n", list->toString(list));
+
+list->clear(list);
+```
+
+or
+
+```C
+LinkedList* list = LinkedListConstructor();
+
+list->insertString(list, "Dua Lipa", 0);
+list->insertString(list, "Matue", -1);
+list->insertString(list, "Neoni", 1);
+
+// heap-allocated string
+char* list_print = malloc(list->getStrSize(list));
+printf("%s\n", list->toString(list));
 free(list_print);
 
 list->clear(list);
 ```
 
 ```
-[Neoni, AViVA, Matue]
+[Dua Lipa, Neoni, Matue]
 ```
 
 <br>
@@ -167,25 +241,50 @@ LinkedList* list1 = LinkedListConstructor();
 LinkedList* list2 = LinkedListConstructor();
 LinkedList* list3 = LinkedListConstructor();
 
+list2->insertInt(list2, 7, -1);
+
 list1->insertList(list1, list2, -1);
 list1->insertList(list1, list3, -1);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
-free(list_print);
-
-list2->insertInt(list2, 7, -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
 
 list3->insertDouble(list3, 125.5, -1);
 list3->insertChar(list3, 'I', -1);
 
-list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->clear(list1);
+list2->clear(list2);
+list3->clear(list3);
+```
+
+or
+
+```C
+LinkedList* list1 = LinkedListConstructor();
+LinkedList* list2 = LinkedListConstructor();
+LinkedList* list3 = LinkedListConstructor();
+
+list2->insertInt(list2, 7, -1);
+
+list1->insertList(list1, list2, -1);
+list1->insertList(list1, list3, -1);
+
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
-LinkedList* removedList = list1->get(list1, 0);
-list_print = list->toString(removedList);
-printf("removed: %s\n", list_print);
+list3->insertDouble(list3, 125.5, -1);
+list3->insertChar(list3, 'I', -1);
+
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->clear(list1);
@@ -194,10 +293,13 @@ list3->clear(list3);
 ```
 
 ```
-[[], []]
+[[7], []]
 [[7], [125.5, I]]
-removed: [7]
 ```
+
+> You can also call `list->insertList(list, LinkedListConstructor(), 0)` without facing lost pointer problems, since you can return the pointer to the inserted list with `list->get(list, <list-index>)` or `list->remove(list, <list-index>)` (considering you store the remove return value).
+
+> The `list->clear(list)` function doesn't clear the internal lists yet, so using the insertion with `LinkedListConstructor()` might cause lost pointer problems if the internal lists aren't removed, cleared and freed individually. In later updates I'll be adding a boolean value to the `list->clear(list)` function to define whether the internal lists should be cleared and freed or not.
 
 <br>
 
@@ -223,12 +325,39 @@ LinkedList* list = LinkedListConstructor();
 
 list->insertStruct(list, elliot, -1);
 
-char* list_print = list->toString(list);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list->getStrSize(list)];
+printf("%s\n", list->toString(list));
+
+Character* character = list->get(list, 0);
+printf("%s from %s\n", character->name, character->origin);
+
+list->clear(list);
+```
+
+or
+
+```C
+typedef struct Character{
+  char* name;
+  char* origin;
+} Character;
+
+Character* elliot = malloc(sizeof(Character));
+elliot->name = "Elliot Alderson";
+elliot->origin = "Mr. Robot";
+
+LinkedList* list = LinkedListConstructor();
+
+list->insertStruct(list, elliot, -1);
+
+// heap-allocated string
+char* list_print = list->getStrSize(list);
+printf("%s\n", list->toString(list));
 free(list_print);
 
-Character* removedCharacter = list->get(list, 0);
-printf("%s from %s\n", removedCharacter->name, removedCharacter->origin);
+Character* character = list->get(list, 0);
+printf("%s from %s\n", character->name, character->origin);
 
 list->clear(list);
 ```
@@ -249,7 +378,7 @@ Returns a _`void*`_ pointer to the removed value, which can and should be casted
 1. _`LinkedList* list`_: A pointer to the Linked List from where the value will be removed
 2. _`int index`_: The index (from $-1$ to $list.size-1$), being $-1$ to remove the last value, and $\ge0$ the index of the Node from which the value will be removed
 
-> Since `int`, `double`, `char` and `string` are stored using `memcpy()`, and `list` and `struct` are created using `malloc()`, the user can and should `free()` the removed value after it's no longer needed. **Keep in mind that casting the returned pointer into a non-pointer variable causes the loss of the pointer needed to free the allocated memory.**
+> `int`, `double` and `char` are stored and returned as copies, so casting the return value back to their original, and `list` and `struct` are created using `malloc()`, the user can and should `free()` the removed value after it's no longer needed. **Keep in mind that casting the returned pointer into a non-pointer variable causes the loss of the pointer needed to free the allocated memory.**
 
 ```C
 LinkedList* list1 = LinkedListConstructor();
@@ -259,29 +388,78 @@ list1->insertInt(list1, 7, -1);
 list1->insertDouble(list1, 3.14, -1);
 list1->insertList(list1, list2, -1);
 
-char* list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+int removedInt;
+list1->remove(list1, &removedInt, 0);
+printf("removed: %d\n", removedInt);
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+LinkedList* removedList;
+list1->remove(list1, removedList, -1);
+
+// stack-allocated string
+char list_print[removedList->getStrSize(removedList)];
+printf("Removed: %s\n", removedList->toString(removedList, list_print));
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->clear(list1);
+list2->clear(list2);
+
+free(list1);
+free(list2);
+```
+
+or
+
+```C
+LinkedList* list1 = LinkedListConstructor();
+LinkedList* list2 = LinkedListConstructor();
+
+list1->insertInt(list1, 7, -1);
+list1->insertDouble(list1, 3.14, -1);
+list1->insertList(list1, list2, -1);
+
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
-int* removedInt = list1->remove(list1, 0);
-printf("removed: %d\n", *removedInt);
-free(removedInt);
+int removedInt;
+list1->remove(list1, &removedInt, 0);
+printf("removed: %d\n", removedInt);
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
-LinkedList* removedList = list1->remove(list1, -1);
-char* list_print = removedList->toString(removedList);
-printf("%s\n", list_print);
+LinkedList* removedList;
+list1->remove(list1, removedList, -1);
+
+// heap-allocated string
+char* list_print = malloc(removedList->getStrSize(removedList));
+printf("Removed: %s\n", removedList->toString(removedList, list_print));
 free(list_print);
 
-char* list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->clear(list1);
 list2->clear(list2);
+
+free(list1);
+free(list2);
 ```
 
 ```
@@ -303,7 +481,43 @@ Returns a _`void*`_ pointer to the value, which can be casted to its original ty
 1. _`LinkedList* list`_: A pointer to the Linked List from where the value will be retrieved
 2. _`int index`_: The index (from $-1$ to $list.size-1$), being $-1$ to get the last value, and $\ge0$ the index of the Node from which the value will be retrieved
 
-> Since values are currently being retrieved by reference, `free()`ing a retrieved value may cause the list to have unpredictable behavior.
+```C
+LinkedList* list1 = LinkedListConstructor();
+LinkedList* list2 = LinkedListConstructor();
+
+list1->insertInt(list1, 7, -1);
+list1->insertDouble(list1, 3.14, -1);
+list1->insertList(list1, list2, -1);
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+int* retrievedInt = list1->get(list1, 0);
+printf("retrieved: %d\n", *retrievedInt);
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+LinkedList* retrievedList = list1->get(list1, -1);
+
+// stack-allocated string
+char list_print[retrievedList->getStrSize(retrievedList)];
+printf("retrieved: %s\n", retrievedList->toString(retrievedList));
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->clear(list1);
+list2->clear(list2);
+
+free(list1);
+free(list2);
+```
+
+or
 
 ```C
 LinkedList* list1 = LinkedListConstructor();
@@ -313,28 +527,38 @@ list1->insertInt(list1, 7, -1);
 list1->insertDouble(list1, 3.14, -1);
 list1->insertList(list1, list2, -1);
 
-char* list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
-int* retrievedInt = list1->get(list1, 0);
-printf("retrieved: %d\n", *retrievedInt);
+int removedInt;
+list1->get(list1, &removedInt, 0);
+printf("retrieved: %d\n", removedInt);
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
-LinkedList* retrievedList = list1->get(list1, -1);
-list_print = retrievedList->toString(retrievedList);
-printf("retrieved: %s\n", retrievedList->toString(retrievedList));
+LinkedList* removedList;
+list1->get(list1, removedList, -1);
+
+// heap-allocated string
+char* list_print = malloc(removedList->getStrSize(removedList));
+printf("retrieved: %s\n", removedList->toString(removedList, list_print));
 free(list_print);
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->clear(list1);
 list2->clear(list2);
+
+free(list1);
+free(list2);
 ```
 
 ```
@@ -387,42 +611,89 @@ Returns a string showing all values stored in the Linked List. The amount of dig
 
 1. _`LinkedList* list`_: A pointer to the list to be read
 
-> The only way I could think of printing the list with `printf()` was by using `malloc()` to return a dynamically-sized string, so it is recommended that the user stores the return of `LinkedList.toString()` inside of a `char*` variable so that they can `free()` it later. I'm working on alternatives for this.
+```C
+LinkedList* list1 = LinkedListConstructor();
+LinkedList* list2 = LinkedListConstructor();
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->insertInt(list1, 7, -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->insertDouble(list1, 3.14159, -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->insertChar(list1, 'V', -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->insertString(list1, "Neoni", -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->insertList(list1, list2, -1);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->clear(list1);
+
+free(list1);
+```
+
+or
 
 ```C
 LinkedList* list1 = LinkedListConstructor();
 LinkedList* list2 = LinkedListConstructor();
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->insertInt(list1, 7, -1);
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->insertDouble(list1, 3.14159, -1);
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->insertChar(list1, 'V', -1);
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->insertString(list1, "Neoni", -1);
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->insertList(list1, list2, -1);
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->clear(list1);
+
+free(list1);
+free(list2);
 ```
 
 ```
@@ -452,14 +723,39 @@ list1->insertChar(list1, 'V', -1);
 list1->insertString(list1, "Neoni", -1);
 list1->insertList(list1, list2, -1);
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+
+list1->clear(list1);
+
+// stack-allocated string
+char list_print[list1->getStrSize(list1)];
+printf("%s\n", list1->toString(list1));
+```
+
+or
+
+```C
+LinkedList* list1 = LinkedListConstructor();
+LinkedList* list2 = LinkedListConstructor();
+
+list1->insertInt(list1, 7, -1);
+list1->insertDouble(list1, 3.14159, -1);
+list1->insertChar(list1, 'V', -1);
+list1->insertString(list1, "Neoni", -1);
+list1->insertList(list1, list2, -1);
+
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 
 list1->clear(list1);
 
-list_print = list1->toString(list1);
-printf("%s\n", list_print);
+// heap-allocated string
+char* list_print = malloc(list1->getStrSize(list1));
+printf("%s\n", list1->toString(list1));
 free(list_print);
 ```
 
